@@ -1,0 +1,10 @@
+{
+  "name": "inbot",
+  "version": "1.0.0",
+  "description": "a minimal lin bot",
+  "main": "index.ts",
+  "repository": "https://github.com/pablotor/inbot.git",
+  "author": "pablotor",
+  "license": "MIT",
+  "private": true
+}

@@ -2,10 +2,11 @@ import puppeteer from 'puppeteer';
 
 import url from '../../constants/urls.json';
 import logger from '../../utils/logger';
+
 import termImput from '../termInput';
 
 const signin = async (browser: Promise<puppeteer.Browser>) => {
-  logger.info('Opening linkedin');
+  logger.info('Opening linkedin login page');
   const page = await (await browser).newPage();
   await page.goto(url.login);
   const usernameInput = await page.$('#username');
@@ -30,6 +31,7 @@ const signin = async (browser: Promise<puppeteer.Browser>) => {
     await page.screenshot({
       path: `./screenshots/login_redirect_${Date.now().toString()}.png`,
     });
+    logger.debug('URL: %s', afterLoginRedirectURL);
   }
   if (afterLoginRedirectURL === url.feed) {
     logger.info('Successful SignIn');
@@ -43,7 +45,7 @@ const signin = async (browser: Promise<puppeteer.Browser>) => {
       logger.error(afterLoginRedirectHTML);
     }
   }
-  await page.close();
+  page.close();
 };
 
 export default signin;

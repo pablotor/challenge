@@ -17,12 +17,13 @@
     "serve": "node dist/main.js"
   },
   "dependencies": {
-    "node-fetch": "^3.2.3",
+    "node-fetch": "2",
     "winston": "3.6.0"
   },
   "devDependencies": {
     "@types/jest": "27.4.1",
     "@types/node": "17.0.22",
+    "@types/node-fetch": "2.6",
     "@typescript-eslint/eslint-plugin": "^5.0.0",
     "@typescript-eslint/parser": "^5.0.0",
     "eslint": "8.11.0",

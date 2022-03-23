@@ -1,5 +1,6 @@
 import { ApiFn, QueryParams } from '../types/api';
-import { get } from '../utils/api';
+import { Board } from '../types/trello';
+import { get, post } from '../utils/api';
 import logger from '../utils/logger';
 
 const { TRELLO_API_KEY: apiKey, TRELLO_API_TOKEN: apiToken } = process.env;
@@ -34,6 +35,14 @@ export const checkConnection = async () => {
   }
 };
 
-export const createBoard = () => {
-
+export const createBoard = async (name: string) => {
+  try {
+    logger.info(`Creating board with name: ${name}`);
+    const board = await trelloApiCall(post, '/1/boards/', { name }) as Board;
+    logger.info(`Successfully created board ${name}`);
+    return board;
+  } catch (error) {
+    logger.error(`Couldn't create Board. Error: ${error}`);
+    return null;
+  }
 };

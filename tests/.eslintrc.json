@@ -1,0 +1,13 @@
+{
+  "parser": "@typescript-eslint/parser",
+  "plugins": ["jest"],
+  "parserOptions": {
+    "project": "tests/tsconfig.json"
+  },
+  "extends": [
+    "plugin:jest/all"
+  ],
+  "env": {
+    "jest/globals": true
+  } 
+}

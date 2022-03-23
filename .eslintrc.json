@@ -13,26 +13,5 @@
   },
   "plugins": [
     "@typescript-eslint"
-  ],
-  "overrides": [
-    {
-      "files": [
-        "tests/**/*.test.ts"
-      ],
-      "extends": [
-        "plugin:jest/all"
-      ],
-      "parser": "@typescript-eslint/parser",
-      "parserOptions": {
-        "ecmaVersion": 12,
-        "project": "./tests/tsconfig.json"
-      },
-      "plugins": [
-        "jest"
-      ],
-      "env": {
-        "jest/globals": true
-      }
-    }
   ]
 }

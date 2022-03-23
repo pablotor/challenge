@@ -1,17 +1,19 @@
 import fetch from 'node-fetch';
 
+import { ApiFn, QueryParams } from '../types/api';
+
 const METHODS = ['get', 'put', 'post'];
 
 const request = async (
   type: string,
   route: string,
   authToken?: string,
-  queryParams?: Record<string, string | number | boolean>,
+  queryParams?: QueryParams,
 ) => {
   const requestHeaders: HeadersInit = {
     Accept: 'application/json',
     'Content-Type': 'application/json',
-    Authorization: authToken ? `Bearer ${authToken}` : '',
+    Authorization: authToken || '',
   };
   let queryString: string | undefined;
   if (queryParams) {
@@ -29,11 +31,11 @@ const request = async (
   );
 };
 
-const httpMethods = METHODS.map(
+const httpMethods: ApiFn[] = METHODS.map(
   (method) => async (
     route: string,
     authToken?: string,
-    queryParams?: Record<string, string | number | boolean>,
+    queryParams?: QueryParams,
   ) => {
     const res = await request(method.toUpperCase(), route, authToken, queryParams);
     if (res.status >= 400) {

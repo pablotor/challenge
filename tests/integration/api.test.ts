@@ -7,7 +7,7 @@ describe('api', () => {
     () => expect(
       get(
         path,
-        '12121212121212121212121212121212',
+        'Bearer 12121212121212121212121212121212',
         {
           id: 'getTest',
           name: 'lalala',
@@ -26,7 +26,7 @@ describe('api', () => {
     () => expect(
       put(
         path,
-        '34343434343434343434343434343434',
+        'Bearer 34343434343434343434343434343434',
         {
           id: 'putTest',
           name: 'lelele',

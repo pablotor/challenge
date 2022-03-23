@@ -9,6 +9,7 @@
   "private": true,
   "scripts": {
     "devtest": "jest --watch",
+    "test": "jest",
     "coverage": "jest --coverage",
     "dev": "ts-node src/main.ts",
     "prebuild": "rm -rf dist/",

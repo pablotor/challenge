@@ -30,7 +30,7 @@ const logger = createLogger({
     new transports.File({
       filename: `logs/${appName}-combined.log`,
     }),
-  ]
+  ],
 });
 
 //

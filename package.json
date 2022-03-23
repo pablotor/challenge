@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Challenge excercise for WyeWorks",
   "main": "src/main.ts",
-  "repository": "https://github.com/pablotor/inbot.git",
+  "repository": "https://github.com/pablotor/wye-challenge.git",
   "author": "pablotor",
   "license": "MIT",
   "private": true,
@@ -17,6 +17,7 @@
     "serve": "node dist/main.js"
   },
   "dependencies": {
+    "node-fetch": "^3.2.3",
     "winston": "3.6.0"
   },
   "devDependencies": {

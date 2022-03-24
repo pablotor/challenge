@@ -1,20 +1,27 @@
 import { RateLimiter } from 'limiter';
 
-import { ApiFn, QueryParams } from '../types/api';
+import { ApiFn, DataParams } from '../types/api';
 import { Board, Card, List } from '../types/trello';
 import { get, post } from '../utils/api';
 import logger from '../utils/logger';
 
-const { TRELLO_API_KEY: apiKey, TRELLO_API_TOKEN: apiToken } = process.env;
+const {
+  TRELLO_API_KEY: apiKey,
+  TRELLO_API_TOKEN: apiToken,
+  TRELLO_MAX_REQUEST_RATE: maxRate,
+} = process.env;
 
-const trelloLimiter = new RateLimiter({ tokensPerInterval: 1, interval: 150 });
+const trelloLimiter = new RateLimiter({
+  tokensPerInterval: 1,
+  interval: 1000 / (parseInt(maxRate || '8', 10)),
+});
 const trelloApiBaseUrl = 'https://api.trello.com';
 const trelloAuthToken = `OAuth oauth_consumer_key="${apiKey}", oauth_token="${apiToken}"`;
 
 const trelloApiCall = async (
   methodFn: ApiFn,
   route: string,
-  queryParams?: QueryParams,
+  queryParams?: DataParams,
 ) => {
   if (!apiKey || !apiToken) {
     throw Error(
@@ -29,7 +36,7 @@ const trelloApiCall = async (
   );
 };
 
-export const checkConnection = async () => {
+export const checkTrelloConnection = async () => {
   const route = '/1/members/me';
   try {
     logger.info('Connecting to Trello API');
@@ -79,14 +86,13 @@ export const createCard = async (name: string, idList: string) => {
   }
 };
 
-// TODO: make this work
-export const addCardCover = async (idCard: string, file: string) => {
+export const addCardCover = async (idCard: string, url: string) => {
   const route = `/1/cards/${idCard}/attachments`;
   try {
     logger.info(`Adding card cover to card ID: ${idCard}`);
-    const list = await trelloApiCall(post, route, { file, setCover: true }) as Board;
+    const card = await trelloApiCall(post, route, { url, setCover: true });
     logger.info(`Successfully added cover to card ID: ${idCard}`);
-    return list;
+    return card as Card;
   } catch (error) {
     logger.error(`Couldn't add cover to card  ID: ${idCard}. Error: ${error}`);
     return null;

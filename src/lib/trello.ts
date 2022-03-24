@@ -44,7 +44,7 @@ export const createBoard = async (name: string) => {
   const route = '/1/boards/';
   try {
     logger.info(`Creating board with name: ${name}`);
-    const board = await trelloApiCall(post, route, { name }) as Board;
+    const board = await trelloApiCall(post, route, { name, defaultLists: false }) as Board;
     logger.info(`Successfully created board ${name}`);
     return board;
   } catch (error) {

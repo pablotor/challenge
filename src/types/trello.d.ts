@@ -48,3 +48,74 @@ export interface Board {
     black: string;
   };
 }
+
+export interface List {
+  id: string;
+  name: string;
+  closed: boolean;
+  idBoard: string;
+  pos: number;
+}
+
+export interface Card {
+  attachments: [],
+  id: string;
+  badges: {
+    attachmentsByType: {
+      trello: unknown;
+    };
+    location: boolean;
+    votes: number;
+    viewingMemberVoted: boolean;
+    subscribed: boolean;
+    fogbugz: string;
+    checkItems: number;
+    checkItemsChecked: number;
+    checkItemsEarliestDue: null;
+    comments: number;
+    attachments: number;
+    description: boolean;
+    due: null;
+    dueComplete: boolean;
+    start: null;
+  },
+  checkItemStates: [],
+  closed: boolean;
+  dueComplete: boolean;
+  dateLastActivity: string;
+  desc: string;
+  descData: {
+    emoji: unknown;
+  };
+  due: null;
+  dueReminder: null;
+  email: null;
+  idBoard: string;
+  idChecklists: [],
+  idList: string;
+  idMembers: [],
+  idMembersVoted: [],
+  idShort: number;
+  idAttachmentCover: null;
+  labels: [],
+  idLabels: [],
+  manualCoverAttachment: boolean;
+  name: string;
+  pos: number;
+  shortLink: string;
+  shortUrl: string;
+  start: null;
+  subscribed: boolean;
+  url: string;
+  cover: {
+    idAttachment: null;
+    color: null;
+    idUploadedBackground: null;
+    size: string;
+    brightness: string;
+    idPlugin: null;
+  },
+  isTemplate: boolean;
+  cardRole: null;
+  stickers: [],
+}

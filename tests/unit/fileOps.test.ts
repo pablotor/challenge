@@ -1,4 +1,4 @@
-import getAlbumsFromFile from '../../src/lib/getAlbumsFromFile';
+import getAlbumsFromFile from '../../src/lib/fileOps';
 
 describe('getAlbumsFromFile', () => {
   const absPath = `${__dirname}/../testFiles`;

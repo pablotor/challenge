@@ -1,7 +1,11 @@
 import { RateLimiter } from 'limiter';
 
 import { ApiFn, DataParams } from '../types/api';
-import { Board, Card, List } from '../types/trello';
+import {
+  BoardResponse,
+  CardResponse,
+  ListResponse,
+} from '../types/trello';
 import { get, post } from '../utils/api';
 import logger from '../utils/logger';
 
@@ -44,6 +48,7 @@ export const checkTrelloConnection = async () => {
     logger.info('Successfully connected to Trello API');
   } catch (error) {
     logger.error(`Couldn't connect to Trello API. Error: ${error}`);
+    throw new Error('Trello connection Error');
   }
 };
 
@@ -51,7 +56,7 @@ export const createBoard = async (name: string) => {
   const route = '/1/boards/';
   try {
     logger.info(`Creating board with name: ${name}`);
-    const board = await trelloApiCall(post, route, { name, defaultLists: false }) as Board;
+    const board = await trelloApiCall(post, route, { name, defaultLists: false }) as BoardResponse;
     logger.info(`Successfully created board ${name}`);
     return board;
   } catch (error) {
@@ -64,9 +69,9 @@ export const createList = async (name: string, idBoard: string) => {
   const route = '/1/lists';
   try {
     logger.info(`Creating list with name: ${name} in board: ${idBoard}`);
-    const list = await trelloApiCall(post, route, { name, idBoard });
+    const list = await trelloApiCall(post, route, { name, idBoard }) as ListResponse;
     logger.info(`Successfully created list ${name}`);
-    return list as List;
+    return list;
   } catch (error) {
     logger.error(`Couldn't create list ${name}. Error: ${error}`);
     return null;
@@ -77,9 +82,9 @@ export const createCard = async (name: string, idList: string) => {
   const route = '/1/cards';
   try {
     logger.info(`Creating card with name: ${name} in list: ${idList}`);
-    const card = await trelloApiCall(post, route, { name, idList });
+    const card = await trelloApiCall(post, route, { name, idList }) as CardResponse;
     logger.info(`Successfully created card ${name}`);
-    return card as Card;
+    return card;
   } catch (error) {
     logger.error(`Couldn't create card ${name}. Error: ${error}`);
     return null;
@@ -90,9 +95,9 @@ export const addCardCover = async (idCard: string, url: string) => {
   const route = `/1/cards/${idCard}/attachments`;
   try {
     logger.info(`Adding card cover to card ID: ${idCard}`);
-    const card = await trelloApiCall(post, route, { url, setCover: true });
+    const card = await trelloApiCall(post, route, { url, setCover: true }) as CardResponse;
     logger.info(`Successfully added cover to card ID: ${idCard}`);
-    return card as Card;
+    return card;
   } catch (error) {
     logger.error(`Couldn't add cover to card  ID: ${idCard}. Error: ${error}`);
     return null;

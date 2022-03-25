@@ -1,4 +1,5 @@
 import { RateLimiter } from 'limiter';
+import { Album } from '../types/album';
 
 import { ApiFn, DataParams } from '../types/api';
 import { AlbumSearch, AuthResponse } from '../types/spotify';
@@ -72,11 +73,27 @@ export const searchAlbum = async (query: string) => {
   const route = '/v1/search';
   try {
     logger.info(`Searching album with title: ${query}`);
-    const queryResult = await spotifyApiCall(get, route, { q: `album:${query}`, type: 'album' }) as AlbumSearch;
+    const queryResult = await spotifyApiCall(
+      get,
+      route,
+      { q: `album:${query}`, type: 'album' },
+    ) as AlbumSearch;
     logger.info(`Search successful. Found ${queryResult.albums.total} albums with title ${query}`);
     return queryResult;
   } catch (error) {
     logger.error(`Search failed. Error: ${error}`);
     return null;
   }
+};
+
+export const getAlbumCover = async (album: Album) => {
+  const queryResult = await searchAlbum(album.title);
+  const correctAlbum = queryResult?.albums.items?.find(
+    (item) => item.release_date.includes(album.year.toString()),
+  );
+  if (!correctAlbum) {
+    logger.info('Cover not present');
+    return null;
+  }
+  return correctAlbum.images[0].url;
 };

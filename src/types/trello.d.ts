@@ -1,4 +1,4 @@
-export interface Board {
+export interface BoardResponse {
   id: string;
   name: string;
   desc: string;
@@ -49,7 +49,7 @@ export interface Board {
   };
 }
 
-export interface List {
+export interface ListResponse {
   id: string;
   name: string;
   closed: boolean;
@@ -57,7 +57,7 @@ export interface List {
   pos: number;
 }
 
-export interface Card {
+export interface CardResponse {
   attachments: [],
   id: string;
   badges: {
@@ -118,4 +118,25 @@ export interface Card {
   isTemplate: boolean;
   cardRole: null;
   stickers: [],
+}
+
+export interface Card {
+  id: string;
+  title: string;
+  year: number;
+  listId: string;
+}
+
+export interface List {
+  name: string;
+  id: string;
+  boardId: string;
+  cards: Card[];
+}
+
+export interface Board {
+  name: string;
+  id: string;
+  lists: List[];
+  cards: Card[];
 }

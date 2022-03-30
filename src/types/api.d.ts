@@ -1,9 +1,10 @@
 export type DataParams = Record<string | number, string | number | boolean>;
+export type ContentType = 'application/json' | 'application/x-www-form-urlencoded';
 
-export type ApiFn = (
+export type ApiFn = <ResponseBodyType>(
   route: string,
   authToken?: string,
   queryParams?: DataParams,
   bodyParams?: DataParams,
-  contentType?: 'application/json' | 'application/x-www-form-urlencoded',
-) => Promise<unknown>;
+  contentType?: ContentType,
+) => Promise<ResponseBodyType>;

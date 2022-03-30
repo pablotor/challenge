@@ -2,7 +2,7 @@ import { RateLimiter } from 'limiter';
 import { Album } from '../types/album';
 
 import { ApiFn, DataParams } from '../types/api';
-import { AlbumSearch, AuthResponse } from '../types/spotify';
+import { AlbumItem, AlbumSearchResponse, AuthResponse } from '../types/spotify';
 import { get, post } from '../utils/api';
 import logger from '../utils/logger';
 
@@ -17,7 +17,7 @@ const spotifyLimiter = new RateLimiter({
   interval: 1000 / (parseInt(maxRate || '8', 10)),
 });
 
-// The auth token has to be asked to Spotify. Will be set when connectToSpotify fn is exec
+// The auth token has to be requested to Spotify. Will be set when connectToSpotify fn is exec
 let spotifyAuthToken: string;
 
 const spotifyAuthTokenUrl = 'https://accounts.spotify.com/api/token';
@@ -31,13 +31,13 @@ export const connectToSpotify = async () => {
   try {
     logger.info('Connecting to Spotify');
     // Retrieve auth token from spotify
-    const authResponse = await post(
+    const authResponse = await post<AuthResponse>(
       spotifyAuthTokenUrl,
       `Basic ${Buffer.from(`${clientId}:${clientSecret}`).toString('base64')}`,
       undefined,
       { grant_type: 'client_credentials' },
       'application/x-www-form-urlencoded',
-    ) as AuthResponse;
+    );
     const { access_token: accessToken, token_type: tokenType } = authResponse;
 
     spotifyAuthToken = `${tokenType} ${accessToken}`;
@@ -50,7 +50,7 @@ export const connectToSpotify = async () => {
 
 const spotifyApiBaseUrl = 'https://api.spotify.com';
 
-const spotifyApiCall = async (
+const spotifyApiCall = async <ResponseBodyType>(
   methodFn: ApiFn,
   route: string,
   queryParams?: DataParams,
@@ -62,22 +62,19 @@ const spotifyApiCall = async (
     await connectToSpotify();
   }
   await spotifyLimiter.removeTokens(1);
-  return methodFn(
+  return methodFn<ResponseBodyType>(
     `${spotifyApiBaseUrl}${route}`,
     spotifyAuthToken,
     queryParams,
   );
 };
 
-export const searchAlbum = async (query: string) => {
+export const searchAlbum = async (query: string, queryParams?: DataParams) => {
   const route = '/v1/search';
+  const params = { q: `album:${query}`, type: 'album', ...queryParams };
   try {
     logger.info(`Searching album with title: ${query}`);
-    const queryResult = await spotifyApiCall(
-      get,
-      route,
-      { q: `album:${query}`, type: 'album' },
-    ) as AlbumSearch;
+    const queryResult = await spotifyApiCall<AlbumSearchResponse>(get, route, params);
     logger.info(`Search successful. Found ${queryResult.albums.total} albums with title ${query}`);
     return queryResult;
   } catch (error) {
@@ -87,12 +84,19 @@ export const searchAlbum = async (query: string) => {
 };
 
 export const getAlbumCover = async (album: Album) => {
-  const queryResult = await searchAlbum(album.title);
-  const correctAlbum = queryResult?.albums.items?.find(
-    (item) => item.release_date.includes(album.year.toString()),
-  );
+  let queryResult: AlbumSearchResponse | null;
+  let correctAlbum: AlbumItem;
+  let offset = 0;
+  do {
+    // eslint-disable-next-line no-await-in-loop
+    queryResult = await searchAlbum(album.title, { offset });
+    correctAlbum = queryResult?.albums.items?.find(
+      (item) => item.release_date.includes(album.year.toString()),
+    );
+    offset += 20;
+  } while (!correctAlbum && (queryResult?.albums.total || 0) > offset);
   if (!correctAlbum) {
-    logger.info('Cover not present');
+    logger.info(`Cover not present for album ${album.title}`);
     return null;
   }
   return correctAlbum.images[0].url;

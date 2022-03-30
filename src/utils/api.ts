@@ -1,6 +1,6 @@
 import fetch from 'node-fetch';
 
-import { ApiFn, DataParams } from '../types/api';
+import { ApiFn, ContentType, DataParams } from '../types/api';
 
 const METHODS = ['get', 'put', 'post'];
 
@@ -14,7 +14,7 @@ const request = async (
   authToken?: string,
   queryParams?: DataParams,
   bodyParams?: DataParams,
-  contentType = 'application/json',
+  contentType: ContentType = 'application/json',
 ) => {
   const headers: HeadersInit = {
     Accept: 'application/json',
@@ -27,9 +27,9 @@ const request = async (
   }
   let body: string | undefined;
   if (bodyParams) {
-    body = contentType === 'application/json'
-      ? JSON.stringify(bodyParams)
-      : toQueryString(bodyParams);
+    body = contentType === 'application/x-www-form-urlencoded'
+      ? toQueryString(bodyParams)
+      : JSON.stringify(bodyParams);
   }
 
   return fetch(
@@ -43,12 +43,12 @@ const request = async (
 };
 
 const httpMethods: ApiFn[] = METHODS.map(
-  (method) => async (
+  (method) => async <ResponseBodyType>(
     route: string,
     authToken?: string,
     queryParams?: DataParams,
     bodyParams?: DataParams,
-    contentType?: string,
+    contentType?: ContentType,
   ) => {
     const res = await request(
       method.toUpperCase(),
@@ -64,7 +64,7 @@ const httpMethods: ApiFn[] = METHODS.map(
     }
 
     const resData = await res.json().catch(() => undefined);
-    return resData;
+    return resData as ResponseBodyType;
   },
 );
 

@@ -14,14 +14,23 @@ import {
 const main = async () => {
   const filePath = `${__dirname}/../${process.env.FILENAME}`;
   logger.info('Initializing app');
-  logger.info('Checking connections');
-  await connectToSpotify();
-  await checkTrelloConnection();
+  try {
+    logger.info('Checking connections');
+    await Promise.all([
+      connectToSpotify(),
+      checkTrelloConnection(),
+    ]);
+  } catch (error) {
+    logger.error(`Connections Error. ${error}. \nExiting.`);
+    exit(1);
+  }
   logger.info('Connections OK! Starting script.');
   const albumArray = getAlbumsFromFile(filePath);
-  const coverStore = getCoversFromSpotify(albumArray);
-  const trelloBoard = await postAlbumsToTrello(albumArray);
-  await updateTrelloCardsWithAlbumCovers(trelloBoard.cards, await coverStore);
+  const [coverStore, trelloBoard] = await Promise.all([
+    getCoversFromSpotify(albumArray),
+    postAlbumsToTrello(albumArray),
+  ]);
+  await updateTrelloCardsWithAlbumCovers(trelloBoard.cards, coverStore);
   logger.info('Script finished. Goodbye!');
   exit(0);
 };

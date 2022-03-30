@@ -19,7 +19,7 @@ export interface AlbumImage {
   width: number;
 }
 
-export interface Album {
+export interface AlbumItem {
   album_type: string;
   artists: Artist[];
   available_markets: string[];
@@ -35,7 +35,7 @@ export interface Album {
   uri: string;
 }
 
-export interface AlbumSearch {
+export interface AlbumSearchResponse {
   albums: {
     href: string;
     items: Album[];

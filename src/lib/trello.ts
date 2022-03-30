@@ -22,7 +22,7 @@ const trelloLimiter = new RateLimiter({
 const trelloApiBaseUrl = 'https://api.trello.com';
 const trelloAuthToken = `OAuth oauth_consumer_key="${apiKey}", oauth_token="${apiToken}"`;
 
-const trelloApiCall = async (
+const trelloApiCall = async <ResponseBodyType>(
   methodFn: ApiFn,
   route: string,
   queryParams?: DataParams,
@@ -33,7 +33,7 @@ const trelloApiCall = async (
     );
   }
   await trelloLimiter.removeTokens(1);
-  return methodFn(
+  return methodFn<ResponseBodyType>(
     `${trelloApiBaseUrl}${route}`,
     trelloAuthToken,
     queryParams,
@@ -54,9 +54,10 @@ export const checkTrelloConnection = async () => {
 
 export const createBoard = async (name: string) => {
   const route = '/1/boards/';
+  const params = { name, defaultLists: false };
   try {
     logger.info(`Creating board with name: ${name}`);
-    const board = await trelloApiCall(post, route, { name, defaultLists: false }) as BoardResponse;
+    const board = await trelloApiCall<BoardResponse>(post, route, params);
     logger.info(`Successfully created board ${name}`);
     return board;
   } catch (error) {
@@ -67,9 +68,10 @@ export const createBoard = async (name: string) => {
 
 export const createList = async (name: string, idBoard: string) => {
   const route = '/1/lists';
+  const params = { name, idBoard };
   try {
     logger.info(`Creating list with name: ${name} in board: ${idBoard}`);
-    const list = await trelloApiCall(post, route, { name, idBoard }) as ListResponse;
+    const list = await trelloApiCall<ListResponse>(post, route, params);
     logger.info(`Successfully created list ${name}`);
     return list;
   } catch (error) {
@@ -80,10 +82,11 @@ export const createList = async (name: string, idBoard: string) => {
 
 export const createCard = async (name: string, idList: string) => {
   const route = '/1/cards';
+  const params = { name, idList };
   try {
     logger.info(`Creating card with name: ${name} in list: ${idList}`);
-    const card = await trelloApiCall(post, route, { name, idList }) as CardResponse;
-    logger.info(`Successfully created card ${name}`);
+    const card = await trelloApiCall<CardResponse>(post, route, params);
+    logger.info(`Successfully created card ${name}. Card ID is: ${card.id}`);
     return card;
   } catch (error) {
     logger.error(`Couldn't create card ${name}. Error: ${error}`);
@@ -93,9 +96,10 @@ export const createCard = async (name: string, idList: string) => {
 
 export const addCardCover = async (idCard: string, url: string) => {
   const route = `/1/cards/${idCard}/attachments`;
+  const params = { url, setCover: true };
   try {
     logger.info(`Adding card cover to card ID: ${idCard}`);
-    const card = await trelloApiCall(post, route, { url, setCover: true }) as CardResponse;
+    const card = await trelloApiCall<CardResponse>(post, route, params);
     logger.info(`Successfully added cover to card ID: ${idCard}`);
     return card;
   } catch (error) {

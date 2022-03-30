@@ -6,3 +6,5 @@ export interface Album {
 export interface AlbumLibrary {
   [decade: string]: Album[];
 }
+
+export type CoverStore = Record<string, string | null>;

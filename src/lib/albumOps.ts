@@ -1,4 +1,4 @@
-import { Album, AlbumLibrary } from '../types/album';
+import { Album, AlbumLibrary, CoverStore } from '../types/album';
 import { Board, Card } from '../types/trello';
 import asyncIterator from '../utils/asyncIterator';
 import titleToID from '../utils/titleToID';
@@ -100,7 +100,7 @@ export const postAlbumsToTrello = async (albumArray: Album[]) => {
  * the cover url or null as value, depending on if the album cover is found.
  */
 export const getCoversFromSpotify = async (albumArray: Album[]) => {
-  const coverStore: Record<string, string | null> = {};
+  const coverStore: CoverStore = {};
   await Promise.all(
     albumArray.map(async (album) => {
       coverStore[titleToID(album.title)] = await getAlbumCover(album);
@@ -116,7 +116,7 @@ export const getCoversFromSpotify = async (albumArray: Album[]) => {
  */
 export const updateTrelloCardsWithAlbumCovers = async (
   cardArray: Card[],
-  coverStore:Record<string, string | null>,
+  coverStore: CoverStore,
 ) => {
   await Promise.all(
     cardArray.map(async (card) => {

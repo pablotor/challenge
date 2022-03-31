@@ -8,6 +8,7 @@ import {
 } from '../types/trello';
 import { get, post } from '../utils/api';
 import logger from '../utils/logger';
+import { ConnectionError, MissingEnvParamError } from './errors';
 
 const {
   TRELLO_API_KEY: apiKey,
@@ -28,7 +29,7 @@ const trelloApiCall = async <ResponseBodyType>(
   queryParams?: DataParams,
 ) => {
   if (!apiKey || !apiToken) {
-    throw Error(
+    throw new MissingEnvParamError(
       'Trello API Key or API Token are undefined. Check that TRELLO_API_KEY and TRELLO_API_TOKEN exist in .env file or are passed by param',
     );
   }
@@ -47,8 +48,9 @@ export const checkTrelloConnection = async () => {
     await trelloApiCall(get, route);
     logger.info('Successfully connected to Trello API');
   } catch (error) {
-    logger.error(`Couldn't connect to Trello API. Error: ${error}`);
-    throw new Error('Trello connection Error');
+    if (error instanceof MissingEnvParamError) throw error;
+    logger.error(`Couldn't connect to Trello API. ${error}`);
+    throw new ConnectionError('Trello connection Error');
   }
 };
 

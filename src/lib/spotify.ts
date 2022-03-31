@@ -5,6 +5,7 @@ import { ApiFn, DataParams } from '../types/api';
 import { AlbumItem, AlbumSearchResponse, AuthResponse } from '../types/spotify';
 import { get, post } from '../utils/api';
 import logger from '../utils/logger';
+import { ConnectionError, MissingEnvParamError } from './errors';
 
 const {
   SPOTIFY_CLIENT_ID: clientId,
@@ -24,7 +25,7 @@ const spotifyAuthTokenUrl = 'https://accounts.spotify.com/api/token';
 
 export const connectToSpotify = async () => {
   if (!clientId || !clientSecret) {
-    throw Error(
+    throw new MissingEnvParamError(
       'Spotify Client ID or Client Secret is undefined. Check that SPOTIFY_CLIENT_ID and SPOTIFY_CLIENT_SECRET exist in .env file or are passed by param',
     );
   }
@@ -44,7 +45,7 @@ export const connectToSpotify = async () => {
     logger.info('Successfully connected to Spotify');
   } catch (error) {
     logger.error(`Couldn't connect to Spotify. Error: ${error}`);
-    throw new Error('Spotify connection Error');
+    throw new ConnectionError('Spotify connection Error');
   }
 };
 

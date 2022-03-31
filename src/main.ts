@@ -2,6 +2,9 @@ import 'dotenv/config';
 import { exit } from 'process';
 
 import logger from './utils/logger';
+import {
+  ApiError, ConnectionError, FileError, MissingEnvParamError,
+} from './lib/errors';
 import getAlbumsFromFile from './lib/fileOps';
 import { connectToSpotify } from './lib/spotify';
 import { checkTrelloConnection } from './lib/trello';
@@ -20,19 +23,29 @@ const main = async () => {
       connectToSpotify(),
       checkTrelloConnection(),
     ]);
+    logger.info('Connections OK! Starting script.');
+    const albumArray = getAlbumsFromFile(filePath);
+    const [coverStore, trelloBoard] = await Promise.all([
+      getCoversFromSpotify(albumArray),
+      postAlbumsToTrello(albumArray),
+    ]);
+    await updateTrelloCardsWithAlbumCovers(trelloBoard.cards, coverStore);
+    logger.info('Script finished. Goodbye!');
+    exit(0);
   } catch (error) {
-    logger.error(`Connections Error. ${error}. \nExiting.`);
+    if (error instanceof MissingEnvParamError) {
+      logger.error(`Missing Enviroment Param Error. ${error}.\nExiting.`);
+    } else if (error instanceof ConnectionError) {
+      logger.error(`Connection Error. ${error}.\nExiting.`);
+    } else if (error instanceof FileError) {
+      logger.error(`File Error. ${error}.\nExiting.`);
+    } else if (error instanceof ApiError) {
+      logger.error(`Api Error. ${error}.\nExiting.`);
+    } else {
+      logger.error(`Unknown Error. ${error}.\nExiting.`);
+    }
     exit(1);
   }
-  logger.info('Connections OK! Starting script.');
-  const albumArray = getAlbumsFromFile(filePath);
-  const [coverStore, trelloBoard] = await Promise.all([
-    getCoversFromSpotify(albumArray),
-    postAlbumsToTrello(albumArray),
-  ]);
-  await updateTrelloCardsWithAlbumCovers(trelloBoard.cards, coverStore);
-  logger.info('Script finished. Goodbye!');
-  exit(0);
 };
 
 main();

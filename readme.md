@@ -1,4 +1,4 @@
-# WyeWorks Challenge
+# Challenge
 ### by pablotor
 
 ## Prerequisites
